@@ -298,7 +298,7 @@ global $current_user;
                         <ul class="dropdown-menu">
                             <!-- Dashboard - By: eK -->
                             <li>
-                                <a href="/dashboard">Dashboard</a>
+                                <a href="/dev/dashboard">Dashboard</a>
                             </li>
 
                             <li>
