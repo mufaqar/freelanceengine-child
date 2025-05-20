@@ -6,7 +6,7 @@
 					<i class="fa fa-times"></i>
 				</button>
 				<h4 class="modal-title">
-					<?php _e("Bid acceptance confirmation 01", ET_DOMAIN) ?>
+					<?php _e("Bid acceptance confirmation", ET_DOMAIN) ?>
 				</h4>
 			</div>
 			<div class="modal-body">
@@ -32,12 +32,11 @@
 		<span>{{= budget }}</span>
 	</p>
 
-	<# if(commission){ #>
 	<p class="accept-bid-commision">
 		<span><?php _e( 'Commission' , ET_DOMAIN ); ?></span>
 		<span>{{= commission }}</span>
 	</p>
-	<# } #>
+	
 
 	<p class="accept-bid-amount">
 		<span><?php _e( 'Total amount' , ET_DOMAIN ); ?></span>
