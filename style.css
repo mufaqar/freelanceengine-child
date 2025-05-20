@@ -5,11 +5,16 @@ Description:    Child theme for the FreelanceEngine theme
 Author:         Mufaqar
 Author URI:     https://mufaqar.com
 Template:       freelanceengine
-Version:        1.0.1
+Version:        1.0.2
 */
 
 @media (min-width: 1200px) {
     .container {
         width: 1260px;
     }
+}
+
+.find_profile {
+    position: absolute;
+    right: 0px;
 }
