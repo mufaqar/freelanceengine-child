@@ -126,7 +126,7 @@ if ( ae_user_role( $author_id ) == FREELANCER ) {
                                 <li><a href="<?php echo home_url( '/submit-project' ); ?>">Post a Project</a></li>
                                 <li><a href="<?php echo home_url( '/profiles' ); ?>">Find Consultant</a></li>
                             <?php endif; ?>
-                            <?php endif; ?>
+                      
                         </ul>
                     </div>
                 </div>
