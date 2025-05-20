@@ -117,7 +117,7 @@ if ( ae_user_role( $author_id ) == FREELANCER ) {
                         <ul style="padding-left: 20px !important">
                             <li><a href="/profile">My Profile</a></li>
                             <li><a href="/private-message">Private Messages</a></li>
-                            <li><a href="/my-credit">My Credit</a></li>
+                            <li><a href="<?php echo home_url( '/my-credit' );?>">My Credit</a></li>
                             <?php if ( ae_user_role( $author_id ) == FREELANCER ): ?>
                                 <li><a href="/my-project">My Worked Projects</a></li>
                                 <li><a href="/projects">Find Projects</a></li>
