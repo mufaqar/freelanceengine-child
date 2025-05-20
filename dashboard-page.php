@@ -115,16 +115,18 @@ if ( ae_user_role( $author_id ) == FREELANCER ) {
                     <t2>Quick Links</t2>
                     <div class="dashboard-data">
                         <ul style="padding-left: 20px !important">
-                            <li><a href="/profile">My Profile</a></li>
-                            <li><a href="/private-message">Private Messages</a></li>
-                            <li><a href="<?php echo home_url( '/my-credit' );?>">My Credit</a></li>
+                           <li><a href="<?php echo home_url( '/profile' ); ?>">My Profile</a></li>
+                            <li><a href="<?php echo home_url( '/private-message' ); ?>">Private Messages</a></li>
+                            <li><a href="<?php echo home_url( '/my-credit' ); ?>">My Credit</a></li>
                             <?php if ( ae_user_role( $author_id ) == FREELANCER ): ?>
-                                <li><a href="/my-project">My Worked Projects</a></li>
-                                <li><a href="/projects">Find Projects</a></li>
+                                <li><a href="<?php echo home_url( '/my-project' ); ?>">My Worked Projects</a></li>
+                                <li><a href="<?php echo home_url( '/projects' ); ?>">Find Projects</a></li>
                             <?php elseif ( ae_user_role( $author_id ) != FREELANCER ): ?>
-                                <li><a href="/my-project">My Posted Projects</a></li>
-                                <li><a href="/submit-project">Post a Project</a></li>
-                                <li><a href="/profiles">Find Consultant</a></li>
+                                <li><a href="<?php echo home_url( '/my-project' ); ?>">My Posted Projects</a></li>
+                                <li><a href="<?php echo home_url( '/submit-project' ); ?>">Post a Project</a></li>
+                                <li><a href="<?php echo home_url( '/profiles' ); ?>">Find Consultant</a></li>
+                            <?php endif; ?>
+
                             <?php endif; ?>
                         </ul>
                     </div>
