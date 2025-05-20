@@ -147,3 +147,8 @@ cursor: wait; /* Show a loading cursor */
      background-color: rgba(152, 128, 255, 0.2);
  }
 }
+
+
+.rate-it, .free-hourly-rate, .freelance-hourly, .fre-hourly-field {
+    display: none !important;
+}
