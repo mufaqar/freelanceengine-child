@@ -6,7 +6,7 @@
 					<i class="fa fa-times"></i>
 				</button>
 				<h4 class="modal-title">
-					<?php _e("Bid acceptance confirmation", ET_DOMAIN) ?>
+					<?php _e("Bid acceptance confirmation 01", ET_DOMAIN) ?>
 				</h4>
 			</div>
 			<div class="modal-body">
