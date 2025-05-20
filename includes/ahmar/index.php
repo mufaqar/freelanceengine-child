@@ -1,5 +1,5 @@
 <?php
-// silence is gold
+// silence is gold  
 require_once dirname(__FILE__) . '/settings.php';
 if(ae_get_option('use_escrow')) {
 	require_once dirname(__FILE__) . '/ppadaptive.php';
