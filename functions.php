@@ -267,7 +267,7 @@ function cros_shortcode($atts = []) {
 			
 
 			var api_url = "<?php echo OPENAI_URL; ?>/cros/?query=" + encodeURIComponent(input_data);
-            consol.log(api_url);
+            console.log(api_url);
 
 			var settings = {
 				"url": api_url,
