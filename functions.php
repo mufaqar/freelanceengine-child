@@ -1,6 +1,214 @@
 <?php
 
 
+
+
+// new code added by w3villa 
+
+function get_final_search_query($request)
+{
+    if (is_search() && !is_admin()) {
+        // Output the final search query in the error log or display it on the page
+        //error_log($request); // This will log the query in the PHP error log
+        echo $request; // This will display the query on the page (for debugging purposes)
+    }
+	echo $request;
+    return $request;
+}
+//add_filter('posts_request', 'get_final_search_query');
+
+
+// more where clause for meta search in keyword
+function search_by_meta_key_value_where( $where, $wp_query ) {
+    global $wpdb;
+
+    // Check if the meta_key and meta_value are set in the query.
+    if ( isset( $_REQUEST['query']['s'] ) && $_REQUEST['query']['s'] != '' && $wp_query->query_vars['post_type'] == PROFILE ) {
+        // Prepare the WHERE clause to search by meta key and value.
+        $meta_key = 'et_professional_title';
+        $meta_value = $_REQUEST['query']['s'];
+
+        $where .= $wpdb->prepare(
+            " OR $wpdb->posts.ID IN (
+                SELECT post_id FROM $wpdb->postmeta
+                WHERE meta_key = %s
+                AND meta_value LIKE %s
+            )",
+            $meta_key,
+            '%' . $wpdb->esc_like( $meta_value ) . '%'
+        );
+    }
+
+    return $where;
+}
+//add_filter( 'posts_where', 'search_by_meta_key_value_where', 10, 2 );
+
+
+// search with meta, title, content, excerpt, and taxonomy or case
+function search_by_meta_title_content_excerpt_taxonomy_where( $where, $wp_query ) {
+    global $wpdb;
+
+    // Check if the search query (`s`) is set and if the post type is 'PROFILE'.
+    if ( isset( $_REQUEST['query']['s'] ) && $_REQUEST['query']['s'] != '' && isset( $wp_query->query_vars['post_type'] ) && $wp_query->query_vars['post_type'] == PROFILE ) {
+        // Get the search keyword.
+        $search_keyword = $_REQUEST['query']['s'];
+
+        // Prepare the meta key and value search clause.
+        $meta_key = 'et_professional_title';
+        $meta_search = $wpdb->prepare(
+            " $wpdb->posts.ID IN (
+                SELECT post_id FROM $wpdb->postmeta
+                WHERE meta_key = %s
+                AND meta_value LIKE %s
+            )",
+            $meta_key,
+            '%' . $wpdb->esc_like( $search_keyword ) . '%'
+        );
+
+        // Add the title search condition.
+        $title_search = $wpdb->prepare(
+            " $wpdb->posts.post_title LIKE %s",
+            '%' . $wpdb->esc_like( $search_keyword ) . '%'
+        );
+
+        // Add the content search condition.
+        $content_search = $wpdb->prepare(
+            " $wpdb->posts.post_content LIKE %s",
+            '%' . $wpdb->esc_like( $search_keyword ) . '%'
+        );
+
+        // Add the excerpt search condition.
+        $excerpt_search = $wpdb->prepare(
+            " $wpdb->posts.post_excerpt LIKE %s",
+            '%' . $wpdb->esc_like( $search_keyword ) . '%'
+        );
+
+        // Add taxonomy search condition for 'skill'.
+        $taxonomy_search = $wpdb->prepare(
+            " $wpdb->posts.ID IN (
+                SELECT tr.object_id 
+                FROM $wpdb->term_relationships AS tr
+                INNER JOIN $wpdb->term_taxonomy AS tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                INNER JOIN $wpdb->terms AS t ON tt.term_id = t.term_id
+                WHERE tt.taxonomy = %s
+                AND t.name LIKE %s
+            )",
+            'skill', // Replace 'skill' with your taxonomy slug if different
+            '%' . $wpdb->esc_like( $search_keyword ) . '%'
+        );
+
+        // Combine all conditions (meta, title, content, excerpt, and taxonomy) with an OR clause.
+        $where .= " OR ( $meta_search OR $title_search OR $content_search OR $excerpt_search OR $taxonomy_search )";
+
+
+       // added additional or tax and keyword
+		if ( isset( $_REQUEST['query']['skill'] ) && ! empty( $_REQUEST['query']['skill'] ) && 1==1 ) {
+            global $wpdb;
+
+            // Get the 'skill' terms from the query variables
+            $skill_terms = (array) $_REQUEST['query']['skill'];
+
+            // Sanitize the terms for safe usage
+            $skill_terms = array_map( 'sanitize_text_field', $skill_terms );
+
+            // Generate placeholders for the term slugs
+            $placeholders = implode( ', ', array_fill( 0, count( $skill_terms ), '%s' ) );
+
+            // Append the custom WHERE clause for the 'skill' taxonomy
+            $where .= $wpdb->prepare(
+                " OR EXISTS (
+                    SELECT 1 FROM {$wpdb->term_relationships} AS tr
+                    INNER JOIN {$wpdb->term_taxonomy} AS tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                    INNER JOIN {$wpdb->terms} AS t ON tt.term_id = t.term_id
+                    WHERE tr.object_id = {$wpdb->posts}.ID
+                    AND tt.taxonomy = 'skill'
+                    AND t.slug IN ($placeholders)
+                )",
+                $skill_terms
+            );
+        }
+    }
+
+    return $where;
+}
+add_filter( 'posts_where', 'search_by_meta_title_content_excerpt_taxonomy_where', 10, 2 );
+
+
+// added or condition for taxonomy search
+function modify_skill_taxonomy_filter( $query ) {
+    //print_r($_REQUEST['query']);
+   if ($_REQUEST['query']['s'] &&  $_REQUEST['query']['post_type']=='fre_profile' && sizeof($_REQUEST['query']['skill']) > 0) {
+      $query->set( 'tax_query', 'OR' );
+   }
+}
+add_action( 'pre_get_posts', 'modify_skill_taxonomy_filter' );
+
+
+
+
+
+
+// Hook the custom orderby function into 'posts_orderby' filter
+add_filter('posts_orderby', 'custom_search_orderby', 10, 2);
+function custom_search_orderby($orderby, $query)
+{
+    global $wpdb;
+    //echo $orderby;
+    // Check if this is the main search query and 'orderby' is set to 'relevance'
+    if ($query->get('orderby') === 'relevance' || $_REQUEST['query']['s']) {
+
+        // Define your custom order criteria here
+
+        $q = $query->query_vars;
+
+        $orderby = "(CASE 
+                  WHEN {$wpdb->posts}.post_title LIKE '%{$query->get('s')}%' THEN 1
+                  WHEN {$wpdb->posts}.post_content LIKE '%{$query->get('s')}%' THEN 1
+                  WHEN {$wpdb->posts}.post_excerpt LIKE '%{$query->get('s')}%' THEN 3
+                  ";
+
+        // odrer for title with and
+        $orderand = '';
+        $orderby .= " WHEN ";
+        foreach ((array)$q['search_terms'] as $term) :
+            $term = esc_sql(like_escape($term));
+            $orderby .= " {$orderand} {$wpdb->posts}.post_title LIKE '%{$term}%'";
+            $orderand = ' AND ';
+        endforeach;
+        $orderby .= " THEN 4 ";
+
+        // odrer for post_content with and 
+        $orderand = '';
+        $orderby .= " WHEN ";
+        foreach ((array)$q['search_terms'] as $term) :
+            $term = esc_sql(like_escape($term));
+            $orderby .= " {$orderand} {$wpdb->posts}.post_content LIKE '%{$term}%'";
+            $orderand = ' AND ';
+        endforeach;
+        $orderby .= " THEN 5 ";
+
+       
+
+        // last default else   
+        $orderby .= " ELSE 6 END) ";
+
+
+
+        // You can add more custom order criteria as needed, separated by commas
+        // For example, to add sorting by date in ascending order after relevance:
+        $orderby .= ", {$wpdb->posts}.post_date DESC ";
+
+        // Return the custom orderby criteria
+        //echo '======'.$orderby;
+        return $orderby;
+    }
+
+    // For other queries, return the default orderby value
+    //echo '//'.$orderby.'//';
+    return $orderby;
+}
+
+
 // Function to create the shortcode for cros listing and search
 function cros_shortcode($atts = []) {
 
@@ -143,3 +351,17 @@ function cros_shortcode($atts = []) {
 // Register the shortcode
 add_shortcode('cors_list', 'cros_shortcode');
 
+
+function custom_enqueue_styles_with_random_version() {
+    $theme_version = wp_get_theme()->get('Version'); // Get the theme version
+    $random_version = rand(1, 999999); // Generate a random number for the version
+
+    wp_enqueue_style(
+        'freelanceengine-style', 
+        get_template_directory_uri() . '/style.css', 
+        array(), 
+        $random_version, // Use the random number as the version
+        'all'
+    );
+}
+add_action('wp_enqueue_scripts', 'custom_enqueue_styles_with_random_version');
