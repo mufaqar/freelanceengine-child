@@ -352,16 +352,3 @@ function cros_shortcode($atts = []) {
 add_shortcode('cors_list', 'cros_shortcode');
 
 
-function custom_enqueue_styles_with_random_version() {
-    $theme_version = wp_get_theme()->get('Version'); // Get the theme version
-    $random_version = rand(1, 999999); // Generate a random number for the version
-
-    wp_enqueue_style(
-        'freelanceengine-style', 
-        get_template_directory_uri() . '/style.css', 
-        array(), 
-        $random_version, // Use the random number as the version
-        'all'
-    );
-}
-add_action('wp_enqueue_scripts', 'custom_enqueue_styles_with_random_version');
