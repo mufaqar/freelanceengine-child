@@ -250,7 +250,7 @@ global $current_user;
 					<?php } ?>
                     <!-- Menu - By: eK -->
                     <li class="fre-menu-page dropdown-empty">
-                        <a href="cro">CROs</a>
+                        <a href="<?php echo home_url( '/cro' ); ?>">CROs</a>
                     </li>
                     <!-- <li class="fre-menu-page dropdown-empty">
                         <a href="/privacy">Privacy Policy</a>
